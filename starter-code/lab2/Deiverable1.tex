@@ -1,0 +1,143 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\newcommand{\placeholder}[1]{\textit{#1}}
+\newcommand{\cmd}[1]{\texttt{#1}}
+
+\title{Deliverable 1: Nodes, Topics, and Launch Files}
+\author{\placeholder{Your name}}
+\date{\placeholder{Course / date}}
+
+\begin{document}
+\maketitle
+
+\section*{Purpose}
+
+This deliverable documents the ROS 2 nodes, topics, and launch behavior used in
+the two-drone scenario. The answers below should be based on observations from
+the launch file, ROS command-line tools, \cmd{rqt\_graph}, and rViz.
+
+\section*{Commands and Evidence Used}
+
+\begin{itemize}
+  \item Launch command tested:
+    \begin{quote}
+      \cmd{ros2 launch two\_drones\_pkg two\_drones.launch.yaml static:=True}
+    \end{quote}
+  \item Node inspection commands used:
+    \begin{quote}
+      \cmd{ros2 node list}
+
+      \cmd{ros2 node info /}\placeholder{node\_name}
+    \end{quote}
+  \item Topic inspection commands used:
+    \begin{quote}
+      \cmd{ros2 topic list}
+
+      \cmd{ros2 topic info /}\placeholder{topic\_name}
+
+      \cmd{ros2 topic echo /}\placeholder{topic\_name}
+    \end{quote}
+  \item Visual tools checked:
+    \placeholder{Briefly note what you observed in rqt\_graph and rViz.}
+\end{itemize}
+
+\section{Nodes Running in the Static Two-Drone Scenario}
+
+\subsection*{How I Checked}
+
+I used ros2 node list.
+
+\subsection*{Node List}
+
+
+\begin{itemize}
+  \item \cmd{/av1broadcaster}
+  \item \cmd{/av2broadcaster}
+  \item \cmd{/plots\_publisher\_node}
+  \item \cmd{/rviz2\_node}
+  \item \cmd{/transform\_listener\_impl\_571acd970510}
+  \item \cmd{/transform\_listener\_impl\_5e7d7eb49390}
+\end{itemize}
+
+
+\section{Running the Scenario Without \cmd{ros2 launch}}
+
+
+\subsection*{Manual Commands}
+
+\begin{enumerate}
+  \item Terminal 1:
+    \begin{quote}
+      \begin{tabular}{@{}l@{}}
+      \verb|ros2 run tf2_ros static_transform_publisher 1 0 0 0 0 0 world av1|\\
+      \verb|--ros-args -r __node:=av1broadcaster|
+      \end{tabular}
+    \end{quote}
+  \item Terminal 2:
+    \begin{quote}
+      \begin{tabular}{@{}l@{}}
+      \verb|ros2 run tf2_ros static_transform_publisher 0 0 1 0 0 0 world av2|\\
+      \verb|--ros-args -r __node:=av2broadcaster|
+      \end{tabular}
+    \end{quote}
+  \item Terminal 3:
+    \begin{quote}
+      \verb|ros2 run two_drones_pkg plots_publisher_node|
+    \end{quote}
+  \item Terminal 4:
+    \begin{quote}
+      \cmd{rviz}
+    \end{quote}
+\end{enumerate}
+
+\section{Published and Subscribed Topics}
+
+\subsection*{How I Checked}
+
+\placeholder{I used \cmd{ros2 node info <topic\_name>}.} \\
+\\
+\cmd{/av1broadcaster} publishes the \cmd{av1} frame on
+\cmd{/tf\_static}. \\
+\cmd{/av2broadcaster} publishes the \cmd{av2} frame on \cmd{/tf\_static}. \\
+\cmd{/plots\_publisher\_node} publishes visualization markers on \cmd{/visuals}. \\
+\cmd{/rviz2\_node} subscribes to \cmd{/visuals} and displays the drone meshes. \\
+
+\subsection*{Frame Publishers}
+
+\paragraph{Question.}
+What nodes are responsible for publishing the \cmd{av1} and \cmd{av2} frames?
+
+\paragraph{Answer.}
+av1broadcaster and av2broadcaster nodes are responsible to publish transforms for \\
+av1 and av2. 
+\subsection*{rViz Drone Mesh Topic}
+
+\paragraph{Question.}
+Which topic causes rViz to plot the drone meshes?
+
+\paragraph{Answer.}
+rViz uses $visuals$ topic to plot the drone meshes. 
+
+\section{Effect of Omitting \cmd{static:=True}}
+
+\subsection*{Observation}
+\begin{verbatim}
+if static is True:
+  launch static_transform_publisher for av1
+  launch static_transform_publisher for av2
+
+unless static is True:
+  launch frames_publisher_node
+\end{verbatim}
+
+\subsection*{Launch File Explanation}
+
+\paragraph{\cmd{if}.}
+= run this node only when the condition is true
+
+
+\paragraph{\cmd{unless}.}
+= run this node only when the condition is false
+
+\end{document}

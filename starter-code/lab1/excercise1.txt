@@ -1,0 +1,6 @@
+wc -l dante.txt
+19567 dante.txt
+wc -w dante.txt
+97676 dante.txt
+grep -c '.' dante.txt
+14338
